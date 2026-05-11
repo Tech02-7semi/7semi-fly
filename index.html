@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+  <title>7Semi Fly</title>
+
+  <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+
+    <div class="top-icon">
+      📶
+    </div>
+
+    <div class="logo">
+
+      🚁 7Semi Fly
+
+    </div>
+
+    <div class="top-icon">
+      ⚙
+    </div>
+
+  </div>
+
+  <!-- Status -->
+  <div class="status-box">
+
+    <h2 id="status">
+      Connected
+    </h2>
+
+  </div>
+
+  <!-- Telemetry -->
+  <div class="telemetry">
+
+    <div class="card">
+
+      <span>THROTTLE</span>
+
+      <h1 id="throttleText">
+        0%
+      </h1>
+
+    </div>
+
+    <div class="card">
+
+      <span>ROLL</span>
+
+      <h1 id="rollText">
+        0°
+      </h1>
+
+    </div>
+
+    <div class="card">
+
+      <span>PITCH</span>
+
+      <h1 id="pitchText">
+        0°
+      </h1>
+
+    </div>
+
+    <div class="card">
+
+      <span>YAW</span>
+
+      <h1 id="yawText">
+        0°
+      </h1>
+
+    </div>
+
+  </div>
+
+  <!-- Main Controls -->
+  <div class="controls">
+
+    <!-- Left -->
+    <div class="joystick-wrapper">
+
+      <div class="joystick-base"
+           id="leftBase">
+
+        <div class="joystick-stick"
+             id="leftStick">
+
+        </div>
+
+      </div>
+
+      <p>
+        THROTTLE / YAW
+      </p>
+
+    </div>
+
+    <!-- Center -->
+    <div class="center-panel">
+
+      <div class="connection-box">
+
+        <div class="green-dot"></div>
+
+        <h3>
+          Drone Ready
+        </h3>
+
+      </div>
+
+      <button
+        class="stop-btn"
+        onclick="sendCommand('stop')">
+
+        EMERGENCY STOP
+
+      </button>
+
+    </div>
+
+    <!-- Right -->
+    <div class="joystick-wrapper">
+
+      <div class="joystick-base"
+           id="rightBase">
+
+        <div class="joystick-stick"
+             id="rightStick">
+
+        </div>
+
+      </div>
+
+      <p>
+        ROLL / PITCH
+      </p>
+
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+
+</body>
+</html>
