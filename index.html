@@ -8,152 +8,122 @@
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0">
 
+  <meta name="theme-color"
+        content="#111">
+
   <title>7Semi Fly</title>
 
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet"
+        href="style.css">
 
 </head>
 
 <body>
 
-  <!-- Top Bar -->
-  <div class="top-bar">
+  <!-- HEADER -->
+  <header class="top-bar">
 
-    <div class="top-icon">
-      📶
-    </div>
+    <div class="top-icon">📶</div>
 
     <div class="logo">
-
-      🚁 7Semi Fly
-
+      7Semi Fly
     </div>
 
-    <div class="top-icon">
-      ⚙
-    </div>
+    <div class="top-icon">⚙</div>
 
-  </div>
+  </header>
 
-  <!-- Status -->
-  <div class="status-box">
+  <!-- STATUS -->
+  <section class="status-box">
 
     <h2 id="status">
       Connected
     </h2>
 
-  </div>
+  </section>
 
-  <!-- Telemetry -->
-  <div class="telemetry">
+  <!-- TELEMETRY -->
+  <section class="telemetry">
 
     <div class="card">
-
       <span>THROTTLE</span>
-
-      <h1 id="throttleText">
-        0%
-      </h1>
-
+      <h1 id="throttleText">0%</h1>
     </div>
 
     <div class="card">
-
       <span>ROLL</span>
-
-      <h1 id="rollText">
-        0°
-      </h1>
-
+      <h1 id="rollText">0°</h1>
     </div>
 
     <div class="card">
-
       <span>PITCH</span>
-
-      <h1 id="pitchText">
-        0°
-      </h1>
-
+      <h1 id="pitchText">0°</h1>
     </div>
 
     <div class="card">
-
       <span>YAW</span>
-
-      <h1 id="yawText">
-        0°
-      </h1>
-
+      <h1 id="yawText">0°</h1>
     </div>
 
-  </div>
+  </section>
 
-  <!-- Main Controls -->
-  <div class="controls">
+  <!-- CONTROLS -->
+  <main class="controls">
 
-    <!-- Left -->
+    <!-- LEFT JOYSTICK -->
     <div class="joystick-wrapper">
 
       <div class="joystick-base"
-           id="leftBase">
+           id="leftBase"
+           aria-label="Throttle and Yaw Joystick">
 
         <div class="joystick-stick"
-             id="leftStick">
-
-        </div>
+             id="leftStick"></div>
 
       </div>
 
-      <p>
-        THROTTLE / YAW
-      </p>
+      <p>THROTTLE / YAW</p>
 
     </div>
 
-    <!-- Center -->
-    <div class="center-panel">
+    <!-- CENTER -->
+    <section class="center-panel">
 
       <div class="connection-box">
 
         <div class="green-dot"></div>
 
-        <h3>
-          Drone Ready
-        </h3>
+        <h3>Drone Ready</h3>
 
       </div>
 
-      <button
-        class="stop-btn"
-        onclick="sendCommand('stop')">
+      <button type="button"
+              class="stop-btn"
+              onclick="sendCommand('stop')">
 
         EMERGENCY STOP
 
       </button>
 
-    </div>
+    </section>
 
-    <!-- Right -->
+    <!-- RIGHT JOYSTICK -->
     <div class="joystick-wrapper">
 
       <div class="joystick-base"
-           id="rightBase">
+           id="rightBase"
+           aria-label="Roll and Pitch Joystick">
 
         <div class="joystick-stick"
-             id="rightStick">
-
-        </div>
+             id="rightStick"></div>
 
       </div>
 
-      <p>
-        ROLL / PITCH
-      </p>
+      <p>ROLL / PITCH</p>
 
     </div>
 
-  </div>
+  </main>
 
   <script src="script.js"></script>
 

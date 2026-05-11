@@ -1,3 +1,5 @@
+/* style.css */
+
 *{
 
   margin:0;
@@ -5,7 +7,14 @@
 
   box-sizing:border-box;
 
-  font-family:Arial, sans-serif;
+  font-family:Arial,sans-serif;
+
+}
+
+html,
+body{
+
+  touch-action:none;
 
 }
 
@@ -23,7 +32,7 @@ body{
 
 }
 
-/* Top Bar */
+/* TOP BAR */
 
 .top-bar{
 
@@ -67,7 +76,7 @@ body{
 
 }
 
-/* Status */
+/* STATUS */
 
 .status-box{
 
@@ -85,13 +94,13 @@ body{
 
 }
 
-/* Telemetry */
+/* TELEMETRY */
 
 .telemetry{
 
   display:grid;
 
-  grid-template-columns:repeat(4,1fr);
+  grid-template-columns:repeat(5,1fr);
 
   gap:20px;
 
@@ -125,11 +134,11 @@ body{
 
   margin-top:10px;
 
-  font-size:40px;
+  font-size:36px;
 
 }
 
-/* Controls */
+/* CONTROLS */
 
 .controls{
 
@@ -141,7 +150,7 @@ body{
 
 }
 
-/* Joystick */
+/* JOYSTICK */
 
 .joystick-wrapper{
 
@@ -169,8 +178,6 @@ body{
   border:3px solid #1f2937;
 
   position:relative;
-
-  touch-action:none;
 
   background:rgba(255,255,255,0.03);
 
@@ -218,9 +225,13 @@ body{
 
   box-shadow:0 0 25px rgba(0,255,213,0.5);
 
+  transition:
+  left 0.03s linear,
+  top 0.03s linear;
+
 }
 
-/* Center */
+/* CENTER */
 
 .center-panel{
 
@@ -287,7 +298,7 @@ body{
 
 }
 
-/* Mobile */
+/* MOBILE */
 
 @media(max-width:1000px){
 

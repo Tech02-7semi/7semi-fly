@@ -1,36 +1,78 @@
+// script.js
+
 /******************************************************************
  * ESP32 IP
  ******************************************************************/
 const ESP_IP = "192.168.4.1";
 
 /******************************************************************
- * Send Command
+ * UI ELEMENTS
  ******************************************************************/
-async function sendCommand(command, value = "") {
+const statusText =
+document.getElementById("status");
 
-  try {
+const throttleText =
+document.getElementById("throttleText");
 
-    let url =
-    `http://${ESP_IP}/control?cmd=${command}`;
+const rollText =
+document.getElementById("rollText");
 
-    if(value !== "") {
+const pitchText =
+document.getElementById("pitchText");
 
-      url += `&value=${value}`;
+const yawText =
+document.getElementById("yawText");
 
-    }
+const batteryText =
+document.getElementById("batteryText");
+
+/******************************************************************
+ * CONTROL STATE
+ ******************************************************************/
+const controlState = {
+
+  throttle:0,
+  roll:0,
+  pitch:0,
+  yaw:0
+
+};
+
+/******************************************************************
+ * DEADZONE
+ ******************************************************************/
+function applyDeadzone(value, zone = 10){
+
+  return Math.abs(value) < zone
+  ? 0
+  : value;
+
+}
+
+/******************************************************************
+ * SEND CONTROLS
+ ******************************************************************/
+async function sendControls(){
+
+  try{
+
+    const url =
+    `http://${ESP_IP}/control?` +
+    `thr=${controlState.throttle}` +
+    `&roll=${controlState.roll}` +
+    `&pitch=${controlState.pitch}` +
+    `&yaw=${controlState.yaw}`;
 
     await fetch(url);
 
-    document.getElementById("status")
-    .innerHTML =
+    statusText.innerHTML =
     "Connected";
 
   }
 
-  catch(error) {
+  catch(error){
 
-    document.getElementById("status")
-    .innerHTML =
+    statusText.innerHTML =
     "Disconnected";
 
     console.error(error);
@@ -40,9 +82,90 @@ async function sendCommand(command, value = "") {
 }
 
 /******************************************************************
- * Setup Virtual Joystick
+ * SEND LOOP
  ******************************************************************/
-function setupJoystick(baseId, stickId, callback){
+setInterval(() => {
+
+  sendControls();
+
+}, 50);
+
+/******************************************************************
+ * TELEMETRY
+ ******************************************************************/
+async function updateTelemetry(){
+
+  try{
+
+    const response =
+    await fetch(
+      `http://${ESP_IP}/telemetry`
+    );
+
+    const data =
+    await response.json();
+
+    batteryText.innerHTML =
+    `${data.battery}V`;
+
+  }
+
+  catch(error){
+
+    console.error(error);
+
+  }
+
+}
+
+setInterval(updateTelemetry, 2000);
+
+/******************************************************************
+ * EMERGENCY STOP
+ ******************************************************************/
+async function emergencyStop(){
+
+  controlState.throttle = 0;
+  controlState.roll = 0;
+  controlState.pitch = 0;
+  controlState.yaw = 0;
+
+  throttleText.innerHTML = "0%";
+  rollText.innerHTML = "0°";
+  pitchText.innerHTML = "0°";
+  yawText.innerHTML = "0°";
+
+  try{
+
+    await fetch(
+      `http://${ESP_IP}/stop`
+    );
+
+  }
+
+  catch(error){
+
+    console.error(error);
+
+  }
+
+}
+
+document
+.getElementById("stopBtn")
+.addEventListener(
+  "click",
+  emergencyStop
+);
+
+/******************************************************************
+ * JOYSTICK
+ ******************************************************************/
+function setupJoystick(
+  baseId,
+  stickId,
+  callback
+){
 
   const base =
   document.getElementById(baseId);
@@ -53,110 +176,111 @@ function setupJoystick(baseId, stickId, callback){
   let dragging = false;
 
   /****************************************************************
-   * Touch Start
+   * POINTER DOWN
    ****************************************************************/
-  base.addEventListener("touchstart", () => {
+  base.addEventListener(
+    "pointerdown",
+    () => {
 
-    dragging = true;
-
-  });
-
-  /****************************************************************
-   * Touch End
-   ****************************************************************/
-  base.addEventListener("touchend", () => {
-
-    dragging = false;
-
-    /**************************************************************
-     * Return Stick To Center
-     **************************************************************/
-    stick.style.left = "50%";
-
-    stick.style.top = "50%";
-
-    stick.style.transform =
-    "translate(-50%, -50%)";
-
-    callback(0,0);
-
-    sendCommand("stop");
-
-  });
-
-  /****************************************************************
-   * Touch Move
-   ****************************************************************/
-  base.addEventListener("touchmove", (e) => {
-
-    if(!dragging) return;
-
-    e.preventDefault();
-
-    const rect =
-    base.getBoundingClientRect();
-
-    const touch =
-    e.touches[0];
-
-    let x =
-    touch.clientX - rect.left;
-
-    let y =
-    touch.clientY - rect.top;
-
-    const centerX =
-    rect.width / 2;
-
-    const centerY =
-    rect.height / 2;
-
-    let dx = x - centerX;
-
-    let dy = y - centerY;
-
-    /**************************************************************
-     * Limit Radius
-     **************************************************************/
-    const maxDistance = 80;
-
-    const distance =
-    Math.sqrt(dx*dx + dy*dy);
-
-    if(distance > maxDistance){
-
-      dx =
-      dx / distance * maxDistance;
-
-      dy =
-      dy / distance * maxDistance;
+      dragging = true;
 
     }
+  );
 
-    /**************************************************************
-     * Move Stick
-     **************************************************************/
-    stick.style.left =
-    `${centerX + dx}px`;
+  /****************************************************************
+   * POINTER UP
+   ****************************************************************/
+  window.addEventListener(
+    "pointerup",
+    () => {
 
-    stick.style.top =
-    `${centerY + dy}px`;
+      dragging = false;
 
-    stick.style.transform =
-    "translate(-50%, -50%)";
+      stick.style.left = "50%";
+      stick.style.top = "50%";
 
-    /**************************************************************
-     * Normalize
-     **************************************************************/
-    let nx =
-    Math.round((dx / maxDistance) * 100);
+      callback(0,0);
 
-    let ny =
-    Math.round((dy / maxDistance) * 100);
+    }
+  );
 
-    callback(nx, ny);
+  /****************************************************************
+   * POINTER MOVE
+   ****************************************************************/
+  window.addEventListener(
+    "pointermove",
+    (e) => {
 
-  });
+      if(!dragging) return;
+
+      const rect =
+      base.getBoundingClientRect();
+
+      const centerX =
+      rect.width / 2;
+
+      const centerY =
+      rect.height / 2;
+
+      let dx =
+      e.clientX -
+      rect.left -
+      centerX;
+
+      let dy =
+      e.clientY -
+      rect.top -
+      centerY;
+
+      const maxDistance = 80;
+
+      const distance =
+      Math.sqrt(
+        dx * dx +
+        dy * dy
+      );
+
+      if(distance > maxDistance){
+
+        dx =
+        dx / distance *
+        maxDistance;
+
+        dy =
+        dy / distance *
+        maxDistance;
+
+      }
+
+      /************************************************************
+       * MOVE STICK
+       ************************************************************/
+      stick.style.left =
+      `${centerX + dx}px`;
+
+      stick.style.top =
+      `${centerY + dy}px`;
+
+      /************************************************************
+       * NORMALIZE
+       ************************************************************/
+      let nx =
+      Math.round(
+        (dx / maxDistance) * 100
+      );
+
+      let ny =
+      Math.round(
+        (dy / maxDistance) * 100
+      );
+
+      nx = applyDeadzone(nx);
+      ny = applyDeadzone(ny);
+
+      callback(nx, ny);
+
+    }
+  );
 
 }
 
@@ -165,47 +289,41 @@ function setupJoystick(baseId, stickId, callback){
  * THROTTLE + YAW
  ******************************************************************/
 setupJoystick(
+
   "leftBase",
   "leftStick",
 
   (x,y) => {
 
     /**************************************************************
-     * Update UI
-     **************************************************************/
-    document.getElementById("throttleText")
-    .innerHTML =
-    `${Math.abs(y)}%`;
-
-    document.getElementById("yawText")
-    .innerHTML =
-    `${x}°`;
-
-    /**************************************************************
      * THROTTLE
      **************************************************************/
-    let throttle =
-    1200 + (-y * 5);
-
-    sendCommand(
-      "throttle",
-      throttle
+    const throttle =
+    Math.max(
+      0,
+      Math.min(
+        100,
+        Math.abs(y)
+      )
     );
+
+    controlState.throttle =
+    throttle;
 
     /**************************************************************
      * YAW
      **************************************************************/
-    if(x < -20){
+    controlState.yaw =
+    x;
 
-      sendCommand("yaw_left");
+    /**************************************************************
+     * UI
+     **************************************************************/
+    throttleText.innerHTML =
+    `${throttle}%`;
 
-    }
-
-    else if(x > 20){
-
-      sendCommand("yaw_right");
-
-    }
+    yawText.innerHTML =
+    `${x}°`;
 
   }
 
@@ -216,51 +334,32 @@ setupJoystick(
  * ROLL + PITCH
  ******************************************************************/
 setupJoystick(
+
   "rightBase",
   "rightStick",
 
   (x,y) => {
 
     /**************************************************************
-     * Update UI
+     * ROLL
      **************************************************************/
-    document.getElementById("rollText")
-    .innerHTML =
-    `${x}°`;
-
-    document.getElementById("pitchText")
-    .innerHTML =
-    `${-y}°`;
+    controlState.roll =
+    x;
 
     /**************************************************************
      * PITCH
      **************************************************************/
-    if(y < -20){
-
-      sendCommand("forward");
-
-    }
-
-    else if(y > 20){
-
-      sendCommand("backward");
-
-    }
+    controlState.pitch =
+    -y;
 
     /**************************************************************
-     * ROLL
+     * UI
      **************************************************************/
-    if(x < -20){
+    rollText.innerHTML =
+    `${x}°`;
 
-      sendCommand("left");
-
-    }
-
-    else if(x > 20){
-
-      sendCommand("right");
-
-    }
+    pitchText.innerHTML =
+    `${-y}°`;
 
   }
 
